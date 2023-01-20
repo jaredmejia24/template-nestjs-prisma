@@ -17,7 +17,10 @@ enum Status {
 
 model User {
   id        Int      @id @default(autoincrement())
-  name      String
+  firstName String
+  lastName  String
+  email     String   @unique
+  password  String
   status    Status   @default(active)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -26,10 +29,13 @@ model User {
 }
 
 model Bookmark {
-  id        Int      @id @default(autoincrement())
-  status    Status   @default(active)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  link        String
+  status      Status   @default(active)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("bookmark")
 }
