@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Request } from 'express';
+import { NotFoundException } from '@nestjs/common/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserParamsDto } from './dto';
 
 @Injectable()
 export class UserService {
@@ -19,12 +20,25 @@ export class UserService {
         createdAt: true,
       },
     });
-
     return { status: 'success', data: { users } };
   }
 
-  getUserById(req: Request) {
-    const { user } = req;
+  async userExist(dto: UserParamsDto) {
+    const { id } = dto;
+
+    const user = await this.prisma.user.findFirst({
+      where: { id, status: 'active' },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User Not Found');
+    }
+
+    return user;
+  }
+
+  async getUserById(dto: UserParamsDto) {
+    const user = await this.userExist(dto);
 
     delete user.password;
 

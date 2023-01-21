@@ -1,6 +1,6 @@
-import { Request } from 'express';
 import { UserService } from './user.service';
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
+import { UserParamsDto } from './dto';
 
 @Controller('api/v1/users')
 export class UserController {
@@ -12,7 +12,7 @@ export class UserController {
   }
 
   @Get(':id')
-  getUserById(@Req() req: Request) {
-    return this.userService.getUserById(req);
+  getUserById(@Param() dto: UserParamsDto) {
+    return this.userService.getUserById(dto);
   }
 }
