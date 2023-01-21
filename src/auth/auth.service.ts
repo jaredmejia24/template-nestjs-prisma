@@ -37,12 +37,11 @@ export class AuthService {
     const options = {
       httpOnly: true,
     };
-    //using express if using fastify change to setCookie
     res.cookie('token', token, options);
 
     delete user.password;
 
-    return res.status(200).json({ status: 'success', data: { user } });
+    return { status: 'success', data: { user } };
   }
 
   async signup(dto: AuthDto) {
@@ -74,8 +73,6 @@ export class AuthService {
   logout(res: Response) {
     res.clearCookie('token');
 
-    return res
-      .status(200)
-      .json({ status: 'success', message: 'User is no longer in session' });
+    return { status: 'success', message: 'User is no longer in session' };
   }
 }

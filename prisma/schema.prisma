@@ -25,22 +25,6 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  bookmarks Bookmark[]
-
   @@map("user")
 }
 
-model Bookmark {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  link        String
-  status      Status   @default(active)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  userId Int  @map("user_id")
-  user   User @relation(fields: [userId], references: [id])
-
-  @@map("bookmark")
-}

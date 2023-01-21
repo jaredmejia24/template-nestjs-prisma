@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -20,5 +21,13 @@ export class UserService {
     });
 
     return { status: 'success', data: { users } };
+  }
+
+  getUserById(req: Request) {
+    const { user } = req;
+
+    delete user.password;
+
+    return { status: 'success', data: { user } };
   }
 }
