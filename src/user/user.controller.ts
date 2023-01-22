@@ -1,6 +1,15 @@
 import { UserService } from './user.service';
-import { Controller, Get, Param, Req } from '@nestjs/common';
-import { UserParamsDto } from './dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Req,
+} from '@nestjs/common';
+import { UserParamsDto, UserUpdateDto } from './dto';
 import { Request } from 'express';
 
 @Controller('api/v1/users')
@@ -18,7 +27,22 @@ export class UserController {
   }
 
   @Get(':id')
-  getUserById(@Param() dto: UserParamsDto) {
-    return this.userService.getUserById(dto);
+  getUserById(@Param() params: UserParamsDto) {
+    return this.userService.getUserById(params);
+  }
+
+  @Patch(':id')
+  updateUser(
+    @Body() body: UserUpdateDto,
+    @Param() params: UserParamsDto,
+    @Req() req: Request,
+  ) {
+    return this.userService.updateUser(body, params, req);
+  }
+
+  @HttpCode(204)
+  @Delete(':id')
+  deleteUser(@Param() params: UserParamsDto, @Req() req: Request) {
+    return this.userService.deleteUser(params, req);
   }
 }

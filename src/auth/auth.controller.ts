@@ -10,14 +10,14 @@ export class AuthController {
 
   @HttpCode(200)
   @Post('login')
-  login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
-    return this.authService.login(dto, res);
+  login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
+    return this.authService.login(body, res);
   }
 
   @HttpCode(201)
   @Post('signup')
-  signup(@Body() dto: AuthDto) {
-    return this.authService.signup(dto);
+  signup(@Body() body: AuthDto) {
+    return this.authService.signup(body);
   }
 
   @HttpCode(200)

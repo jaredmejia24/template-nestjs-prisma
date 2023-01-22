@@ -16,16 +16,16 @@ import { Response } from 'express';
 export class AuthService {
   constructor(private prisma: PrismaService, private config: ConfigService) {}
 
-  async login(dto: LoginDto, res: Response) {
+  async login(body: LoginDto, res: Response) {
     const user = await this.prisma.user.findFirst({
-      where: { email: dto.email, status: 'active' },
+      where: { email: body.email, status: 'active' },
     });
 
     if (!user) {
       throw new NotFoundException('User Not Found');
     }
 
-    if (!(await bcrypt.compare(dto.password, user.password))) {
+    if (!(await bcrypt.compare(body.password, user.password))) {
       throw new ForbiddenException('Wrong Credentials');
     }
 
@@ -44,19 +44,19 @@ export class AuthService {
     return { status: 'success', data: { user } };
   }
 
-  async signup(dto: AuthDto) {
+  async signup(body: AuthDto) {
     try {
       //encrypt password
       const salt = await bcrypt.genSalt(12);
-      const hashedPassword = await bcrypt.hash(dto.password, salt);
+      const hashedPassword = await bcrypt.hash(body.password, salt);
 
       //create User
       const newUser = await this.prisma.user.create({
         data: {
-          firstName: dto.firstName,
+          firstName: body.firstName,
           password: hashedPassword,
-          lastName: dto.lastName,
-          email: dto.email,
+          lastName: body.lastName,
+          email: body.email,
         },
       });
 
