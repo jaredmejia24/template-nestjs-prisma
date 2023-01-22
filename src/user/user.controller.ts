@@ -1,6 +1,7 @@
 import { UserService } from './user.service';
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Req } from '@nestjs/common';
 import { UserParamsDto } from './dto';
+import { Request } from 'express';
 
 @Controller('api/v1/users')
 export class UserController {
@@ -9,6 +10,11 @@ export class UserController {
   @Get()
   getAllUsers() {
     return this.userService.getAllUsers();
+  }
+
+  @Get('me')
+  getUserInSession(@Req() req: Request) {
+    return this.userService.getUserInSession(req);
   }
 
   @Get(':id')

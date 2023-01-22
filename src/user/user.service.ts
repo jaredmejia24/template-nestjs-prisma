@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common/exceptions';
+import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserParamsDto } from './dto';
 
@@ -21,6 +22,12 @@ export class UserService {
       },
     });
     return { status: 'success', data: { users } };
+  }
+
+  getUserInSession(req: Request) {
+    const { sessionUser } = req;
+
+    return { status: 'success', data: { user: sessionUser } };
   }
 
   async userExist(dto: UserParamsDto) {
