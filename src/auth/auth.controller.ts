@@ -24,10 +24,4 @@ export class AuthController {
   signup(@Body() body: AuthDto) {
     return this.authService.signup(body);
   }
-
-  @HttpCode(200)
-  @Post('logout')
-  logout(@Req() req: Request) {
-    return this.authService.logout(req);
-  }
 }

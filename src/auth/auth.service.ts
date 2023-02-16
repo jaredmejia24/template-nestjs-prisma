@@ -1,7 +1,6 @@
 import { LoginDto } from './dto/auth.dto';
 import { Injectable } from '@nestjs/common';
 import {
-  BadRequestException,
   ConflictException,
   ForbiddenException,
   NotFoundException,
@@ -68,15 +67,5 @@ export class AuthService {
         throw new ConflictException('Email Already Exists');
       }
     }
-  }
-
-  logout(req) {
-    req.logout((err) => {
-      if (err) {
-        throw new BadRequestException('Something went wrong');
-      }
-
-      return { status: 'success', messages: 'User is no longer in session' };
-    });
   }
 }
