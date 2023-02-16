@@ -1,19 +1,24 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
-import { HttpCode } from '@nestjs/common/decorators';
-import { Response } from 'express';
+import { Request } from 'express';
+import { LocalAuthGuard } from './local-auth.guard';
+import { Body, Controller, Post } from '@nestjs/common';
+import { HttpCode, Req, UseGuards } from '@nestjs/common/decorators';
 import { AuthService } from './auth.service';
-import { AuthDto, LoginDto } from './dto';
+import { AuthDto } from './dto';
+import { SkipAuth } from 'src/decorators/skipAuth';
 
 @Controller('api/v1/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @HttpCode(200)
+  @SkipAuth()
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
-    return this.authService.login(body, res);
+  login(@Req() req: Request) {
+    return this.authService.login(req.user);
   }
 
+  @SkipAuth()
   @HttpCode(201)
   @Post('signup')
   signup(@Body() body: AuthDto) {
@@ -22,7 +27,7 @@ export class AuthController {
 
   @HttpCode(200)
   @Post('logout')
-  logout(@Res({ passthrough: true }) res: Response) {
-    return this.authService.logout(res);
+  logout(@Req() req: Request) {
+    return this.authService.logout(req);
   }
 }

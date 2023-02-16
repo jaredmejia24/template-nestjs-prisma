@@ -1,6 +1,7 @@
-import { ConfigService } from '@nestjs/config';
+import { LoginDto } from './dto/auth.dto';
 import { Injectable } from '@nestjs/common';
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   NotFoundException,
@@ -8,15 +9,15 @@ import {
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
-import { AuthDto, LoginDto } from './dto';
-import { Response } from 'express';
+import { AuthDto } from './dto';
+import { User } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private config: ConfigService) {}
+  constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-  async login(body: LoginDto, res: Response) {
+  async validate(body: LoginDto) {
     const user = await this.prisma.user.findFirst({
       where: { email: body.email, status: 'active' },
     });
@@ -29,19 +30,18 @@ export class AuthService {
       throw new ForbiddenException('Wrong Credentials');
     }
 
-    const token = jwt.sign({ id: user.id }, this.config.get('JWT_SECRET'), {
-      expiresIn: '30d',
-    });
-
-    //set cookie
-    const options = {
-      httpOnly: true,
-    };
-    res.cookie('token', token, options);
-
     delete user.password;
 
-    return { status: 'success', data: { user } };
+    return user;
+  }
+
+  async login(user: User) {
+    const payload = { id: user.id };
+
+    return {
+      status: 'success',
+      data: { user, token: this.jwtService.sign(payload) },
+    };
   }
 
   async signup(body: AuthDto) {
@@ -70,9 +70,13 @@ export class AuthService {
     }
   }
 
-  logout(res: Response) {
-    res.clearCookie('token');
+  logout(req) {
+    req.logout((err) => {
+      if (err) {
+        throw new BadRequestException('Something went wrong');
+      }
 
-    return { status: 'success', message: 'User is no longer in session' };
+      return { status: 'success', messages: 'User is no longer in session' };
+    });
   }
 }
