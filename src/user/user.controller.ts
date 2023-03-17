@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger/dist';
 import { UserService } from './user.service';
 import {
   Body,
@@ -11,26 +12,44 @@ import {
 } from '@nestjs/common';
 import { UserParamsDto, UserUpdateDto } from './dto';
 import { Request } from 'express';
+import {
+  ApiBearerAuth,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger/dist/decorators';
 
+@ApiTags('Users')
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({
+  description: 'Missing token or user no longer active',
+})
 @Controller('api/v1/users')
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @ApiOkResponse({ description: 'Return all users in the databse' })
   @Get()
   getAllUsers() {
     return this.userService.getAllUsers();
   }
 
+  @ApiOkResponse({ description: 'Return user in session' })
   @Get('me')
   getUserInSession(@Req() req: Request) {
     return this.userService.getUserInSession(req.user);
   }
 
+  @ApiOkResponse({ description: 'Return user by id' })
+  @ApiNotFoundResponse({ description: 'User not found or user disabled' })
   @Get(':id')
   getUserById(@Param() params: UserParamsDto) {
     return this.userService.getUserById(params);
   }
 
+  @ApiOkResponse({ description: 'Return user updated' })
+  @ApiNotFoundResponse({ description: 'User not found or user disabled' })
   @Patch(':id')
   updateUser(
     @Body() body: UserUpdateDto,
@@ -40,6 +59,8 @@ export class UserController {
     return this.userService.updateUser(body, params, req.user);
   }
 
+  @ApiNoContentResponse({ description: 'User deleted no response' })
+  @ApiNotFoundResponse({ description: 'User not found or user disabled' })
   @HttpCode(204)
   @Delete(':id')
   deleteUser(@Param() params: UserParamsDto, @Req() req: Request) {

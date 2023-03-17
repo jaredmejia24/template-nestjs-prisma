@@ -1,5 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger/dist';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -13,6 +15,20 @@ async function bootstrap() {
   );
 
   app.enableCors();
+
+  const config = new DocumentBuilder()
+    .addBearerAuth()
+    .setTitle('Nestjs example')
+    .setDescription('Nestjs template')
+    .setVersion('1.0')
+    .build();
+
+  const options: SwaggerDocumentOptions = {
+    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+  };
+
+  const document = SwaggerModule.createDocument(app, config, options);
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(4000);
 }
