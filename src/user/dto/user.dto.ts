@@ -17,10 +17,10 @@ export class UserUpdateDto {
   @IsNotEmpty()
   @IsString()
   @IsOptional()
-  firstName: string;
+  firstName?: string;
 
   @IsNotEmpty()
   @IsString()
   @IsOptional()
-  lastName: string;
+  lastName?: string;
 }

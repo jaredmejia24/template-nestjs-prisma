@@ -8,7 +8,7 @@ import {
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { AuthDto } from './dto';
+import { SignUpDto } from './dto';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 
@@ -43,7 +43,7 @@ export class AuthService {
     };
   }
 
-  async signup(body: AuthDto) {
+  async signup(body: SignUpDto) {
     try {
       //encrypt password
       const salt = await bcrypt.genSalt(12);
