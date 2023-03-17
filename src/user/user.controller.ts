@@ -37,12 +37,12 @@ export class UserController {
     @Param() params: UserParamsDto,
     @Req() req: Request,
   ) {
-    return this.userService.updateUser(body, params, req);
+    return this.userService.updateUser(body, params, req.user);
   }
 
   @HttpCode(204)
   @Delete(':id')
   deleteUser(@Param() params: UserParamsDto, @Req() req: Request) {
-    return this.userService.deleteUser(params, req);
+    return this.userService.deleteUser(params, req.user);
   }
 }

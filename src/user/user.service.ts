@@ -1,8 +1,7 @@
 import { User } from '@prisma/client';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common/exceptions';
-import { Request } from 'express';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { UserParamsDto, UserUpdateDto } from './dto';
 
 @Injectable()
@@ -38,11 +37,15 @@ export class UserService {
     return { status: 'success', data: { user } };
   }
 
-  async updateUser(body: UserUpdateDto, params: UserParamsDto, req: Request) {
+  async updateUser(
+    body: UserUpdateDto,
+    params: UserParamsDto,
+    userSession: User,
+  ) {
     const { id } = params;
     const user = await this.userExist(id);
 
-    this.protectUserAccounts(id, req);
+    this.protectUserAccounts(id, userSession);
 
     const updatedUser = await this.prisma.user.update({
       where: { id: user.id },
@@ -54,11 +57,11 @@ export class UserService {
     return { status: 'success', data: { user: updatedUser } };
   }
 
-  async deleteUser(params: UserParamsDto, req: Request) {
+  async deleteUser(params: UserParamsDto, userSession: User) {
     const { id } = params;
     const user = await this.userExist(id);
 
-    this.protectUserAccounts(id, req);
+    this.protectUserAccounts(id, userSession);
 
     await this.prisma.user.update({
       where: { id: user.id },
@@ -80,10 +83,8 @@ export class UserService {
     return user;
   }
 
-  protectUserAccounts(id: number, req: Request) {
-    const { user } = req;
-
-    if (id !== user.id) {
+  protectUserAccounts(id: number, userSession: User) {
+    if (id !== userSession.id) {
       throw new ForbiddenException('You Are Not The Owner Of This Account');
     }
   }
