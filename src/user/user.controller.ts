@@ -23,7 +23,7 @@ export class UserController {
 
   @Get('me')
   getUserInSession(@Req() req: Request) {
-    return this.userService.getUserInSession(req);
+    return this.userService.getUserInSession(req.user);
   }
 
   @Get(':id')

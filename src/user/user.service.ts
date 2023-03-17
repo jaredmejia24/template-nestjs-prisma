@@ -1,3 +1,4 @@
+import { User } from '@prisma/client';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common/exceptions';
 import { Request } from 'express';
@@ -24,14 +25,13 @@ export class UserService {
     return { status: 'success', data: { users } };
   }
 
-  getUserInSession(req: Request) {
-    const { sessionUser } = req;
-
-    return { status: 'success', data: { user: sessionUser } };
+  getUserInSession(user: User) {
+    return { status: 'success', data: { user } };
   }
 
   async getUserById(params: UserParamsDto) {
-    const user = await this.userExist(params);
+    const { id } = params;
+    const user = await this.userExist(id);
 
     delete user.password;
 
@@ -39,9 +39,10 @@ export class UserService {
   }
 
   async updateUser(body: UserUpdateDto, params: UserParamsDto, req: Request) {
-    const user = await this.userExist(params);
+    const { id } = params;
+    const user = await this.userExist(id);
 
-    this.protectUserAccounts(params, req);
+    this.protectUserAccounts(id, req);
 
     const updatedUser = await this.prisma.user.update({
       where: { id: user.id },
@@ -54,9 +55,10 @@ export class UserService {
   }
 
   async deleteUser(params: UserParamsDto, req: Request) {
-    const user = await this.userExist(params);
+    const { id } = params;
+    const user = await this.userExist(id);
 
-    this.protectUserAccounts(params, req);
+    this.protectUserAccounts(id, req);
 
     await this.prisma.user.update({
       where: { id: user.id },
@@ -66,9 +68,7 @@ export class UserService {
     return;
   }
 
-  async userExist(params: UserParamsDto) {
-    const { id } = params;
-
+  async userExist(id: number) {
     const user = await this.prisma.user.findFirst({
       where: { id, status: 'active' },
     });
@@ -80,11 +80,10 @@ export class UserService {
     return user;
   }
 
-  protectUserAccounts(params: UserParamsDto, req: Request) {
-    const { id } = params;
-    const { sessionUser } = req;
+  protectUserAccounts(id: number, req: Request) {
+    const { user } = req;
 
-    if (id !== sessionUser.id) {
+    if (id !== user.id) {
       throw new ForbiddenException('You Are Not The Owner Of This Account');
     }
   }

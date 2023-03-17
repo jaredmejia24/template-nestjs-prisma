@@ -1,11 +1,11 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { ProtectSession } from './auth/auth.middleware';
-import { UserController } from './user/user.controller';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -14,10 +14,6 @@ import { UserController } from './user/user.controller';
     PrismaModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
   ],
-  providers: [PrismaService],
+  providers: [PrismaService, { provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ProtectSession).forRoutes(UserController);
-  }
-}
+export class AppModule {}
