@@ -1,7 +1,8 @@
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { LoginDto } from './dto/auth.dto';
 import { Request } from 'express';
-import { LocalAuthGuard } from './local-auth.guard';
-import { Body, Controller, Post } from '@nestjs/common';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { Body, Controller, Post, Get } from '@nestjs/common';
 import { HttpCode, Req, UseGuards } from '@nestjs/common/decorators';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto';
@@ -38,5 +39,19 @@ export class AuthController {
   @Post('signup')
   signup(@Body() body: SignUpDto) {
     return this.authService.signup(body);
+  }
+
+  @SkipAuth()
+  @UseGuards(GoogleAuthGuard)
+  @Get('google')
+  google() {
+    return;
+  }
+
+  @SkipAuth()
+  @UseGuards(GoogleAuthGuard)
+  @Get('google/callback')
+  googleCallback(@Req() req: Request) {
+    return this.authService.login(req.user);
   }
 }

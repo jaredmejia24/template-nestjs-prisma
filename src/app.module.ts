@@ -1,4 +1,4 @@
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
