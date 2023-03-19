@@ -1,9 +1,9 @@
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { LoginDto } from './dto/auth.dto';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Body, Controller, Post, Get } from '@nestjs/common';
-import { HttpCode, Req, UseGuards } from '@nestjs/common/decorators';
+import { HttpCode, Req, Res, UseGuards } from '@nestjs/common/decorators';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto';
 import { SkipAuth } from 'src/decorators/skipAuth';
@@ -28,8 +28,18 @@ export class AuthController {
   @SkipAuth()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Body() body: LoginDto, @Req() req: Request) {
-    return this.authService.login(req.user);
+  login(
+    @Body() body: LoginDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.login(req.user, res);
+  }
+
+  @HttpCode(200)
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    return this.authService.logout(res);
   }
 
   @ApiConflictResponse({ description: 'User with that email already exists' })
@@ -51,7 +61,10 @@ export class AuthController {
   @SkipAuth()
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
-  googleCallback(@Req() req: Request) {
-    return this.authService.login(req.user);
+  googleCallback(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.googleCallback(req.user, res);
   }
 }

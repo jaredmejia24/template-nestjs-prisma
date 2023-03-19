@@ -31,6 +31,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       where: { email: emails[0].value },
     });
 
+    delete user.password;
+
     return user;
   }
 }
