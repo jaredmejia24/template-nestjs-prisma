@@ -13,7 +13,7 @@ import {
 import { UserParamsDto, UserUpdateDto } from './dto';
 import { Request } from 'express';
 import {
-  ApiBearerAuth,
+  ApiCookieAuth,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger/dist/decorators';
 
 @ApiTags('Users')
-@ApiBearerAuth()
+@ApiCookieAuth('token')
 @ApiUnauthorizedResponse({
   description: 'Missing token or user no longer active',
 })
@@ -29,7 +29,7 @@ import {
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @ApiOkResponse({ description: 'Return all users in the databse' })
+  @ApiOkResponse({ description: 'Return all users in the database' })
   @Get()
   getAllUsers() {
     return this.userService.getAllUsers();

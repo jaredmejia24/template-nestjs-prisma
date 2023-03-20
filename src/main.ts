@@ -19,7 +19,7 @@ async function bootstrap() {
   app.use(cookieParser());
 
   const config = new DocumentBuilder()
-    .addBearerAuth()
+    .addCookieAuth('token')
     .setTitle('Nestjs example')
     .setDescription('Nestjs template')
     .setVersion('1.0')

@@ -10,10 +10,13 @@ import { SkipAuth } from 'src/decorators/skipAuth';
 import { ApiTags } from '@nestjs/swagger/dist';
 import {
   ApiConflictResponse,
+  ApiCookieAuth,
   ApiCreatedResponse,
+  ApiExcludeEndpoint,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger/dist/decorators';
 
 @ApiTags('Auth')
@@ -21,7 +24,7 @@ import {
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @ApiOkResponse({ description: 'Return user and bearer token' })
+  @ApiOkResponse({ description: 'Return user and set token in cookies' })
   @ApiNotFoundResponse({ description: 'User not found or user disabled' })
   @ApiForbiddenResponse({ description: 'wrong email or password' })
   @HttpCode(200)
@@ -36,6 +39,13 @@ export class AuthController {
     return this.authService.login(req.user, res);
   }
 
+  @ApiCookieAuth('token')
+  @ApiUnauthorizedResponse({
+    description: 'Missing token or user no longer active',
+  })
+  @ApiOkResponse({
+    description: 'cookie has been deleted, user is no longer in session',
+  })
   @HttpCode(200)
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response) {
@@ -51,6 +61,7 @@ export class AuthController {
     return this.authService.signup(body);
   }
 
+  @ApiOkResponse({ description: 'User has login with google' })
   @SkipAuth()
   @UseGuards(GoogleAuthGuard)
   @Get('google')
@@ -58,6 +69,7 @@ export class AuthController {
     return;
   }
 
+  @ApiExcludeEndpoint()
   @SkipAuth()
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
