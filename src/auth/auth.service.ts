@@ -1,3 +1,4 @@
+import { Response } from 'express';
 import { LoginDto } from './dto/auth.dto';
 import { Injectable } from '@nestjs/common';
 import {
@@ -34,13 +35,32 @@ export class AuthService {
     return user;
   }
 
-  async login(user: User) {
+  async login(user: User, res: Response) {
     const payload = { id: user.id };
+    const token = this.jwtService.sign(payload);
+
+    // 2592000000 milisegundos = 30 dias
+    res.cookie('token', token, { httpOnly: true, maxAge: 2592000000 });
 
     return {
       status: 'success',
-      data: { user, token: this.jwtService.sign(payload) },
+      data: { user },
     };
+  }
+
+  async googleCallback(user: User, res: Response) {
+    const payload = { id: user.id };
+    const token = this.jwtService.sign(payload);
+
+    // 2592000000 milisegundos = 30 dias
+    res
+      .cookie('token', token, { httpOnly: true, maxAge: 2592000000 })
+      .redirect('/');
+  }
+
+  async logout(res: Response) {
+    res.clearCookie('token');
+    return { status: 'user is no longer in session' };
   }
 
   async signup(body: SignUpDto) {

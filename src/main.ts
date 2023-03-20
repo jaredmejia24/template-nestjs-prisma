@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger/dist';
 import { AppModule } from './app.module';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,9 +16,10 @@ async function bootstrap() {
   );
 
   app.enableCors();
+  app.use(cookieParser());
 
   const config = new DocumentBuilder()
-    .addBearerAuth()
+    .addCookieAuth('token')
     .setTitle('Nestjs example')
     .setDescription('Nestjs template')
     .setVersion('1.0')
